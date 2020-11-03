@@ -1,0 +1,17 @@
+name: "Alexey's Website"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "Inspection Data"
+      href: inspection.html
+    - text: "Dashboard Data"
+      href: dashboard_template.html
+    - icon: fa-envelope fa-lg
+      href: mailto:<aabramov90@gmail.com>
+    - icon: fa-github fa-lg
+      href: http://github.com/aabramov90/
+output:
+  html_document:
+    theme: journal
+    code_folding: hide
