@@ -5,7 +5,9 @@ navbar:
   right:
     - text: "Inspection Data"
       href: inspection.html
-    - text: "Dashboard Data"
+    - text: "Maps"
+      href: maps.html
+    - text: "Dashboard"
       href: dashboard_template.html
     - icon: fa-envelope fa-lg
       href: mailto:<aabramov90@gmail.com>

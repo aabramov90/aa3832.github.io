@@ -1,0 +1,40 @@
+---
+title: "NYC Restaurant Inspections: Mapping the Data"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Setup
+
+```{r Setup}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      warning=FALSE, message=FALSE)
+```
+
+## Loading libraries 
+```{r}
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(plotly)
+library(leaflet)
+library(knitr)
+```
+
+
+## 1.  Pulling in the dataset
+```{r}
+api_url = "https://data.cityofnewyork.us/resource/43nn-pn8j.csv"
+
+rest_inspect = 
+  GET(api_url, query = list("$limit" = 50000)) %>% 
+  content("parsed")
+```
+
+## 2.  Data wrangling, cleaning up the dataset.
+```{r}
+rest_inspect = rest_inspect %>% 
+  filter(grade %in% c("A", "B", "C"), boro != "0")
+```

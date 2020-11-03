@@ -1,5 +1,5 @@
 ---
-title: "plotly"
+title: "NYC Restaurant Inspection: Exploring the Data"
 output: 
   html_document:
     toc: true
@@ -7,53 +7,97 @@ output:
 ---
 
 # Setup
-## Loading the libraries
 
 ```{r Setup}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      warning=FALSE, message=FALSE)
+```
+
+## Loading libraries 
+```{r}
 library(tidyverse)
 library(httr)
 library(jsonlite)
 library(plotly)
 library(leaflet)
+library(knitr)
 ```
 
-## Loading dataset from API
 
-```{r Setup API, eval=FALSE, include=FALSE}
-get_all_inspections = function(url) {
-  
-  all_inspections = vector("list", length = 0)
-  
-  loop_index = 1
-  chunk_size = 50000
-  DO_NEXT = TRUE
-  
-  while (DO_NEXT) {
-    message("Getting data, page ", loop_index)
-    
-    all_inspections[[loop_index]] = 
-      GET(url,
-          query = list(`$order` = "zipcode",
-                       `$limit` = chunk_size,
-                       `$offset` = as.integer((loop_index - 1) * chunk_size)
-                       )
-          ) %>%
-      content("text") %>%
-      fromJSON() %>%
-      as_tibble()
-    
-    DO_NEXT = dim(all_inspections[[loop_index]])[1] == chunk_size
-    loop_index = loop_index + 1
-  }
-  
-  all_inspections
-  
-}
+## 1.  Pulling in the dataset
+```{r}
+api_url = "https://data.cityofnewyork.us/resource/43nn-pn8j.csv"
 
-url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json"
-
-nyc_inspections = 
-  get_all_inspections(url) %>%
-  bind_rows() 
+rest_inspect = 
+  GET(api_url, query = list("$limit" = 50000)) %>% 
+  content("parsed")
 ```
 
+## 2.  Data wrangling, cleaning up the dataset.
+```{r}
+rest_inspect = rest_inspect %>% 
+  filter(grade %in% c("A", "B", "C"), boro != "0")
+```
+
+## 3.  Exploring dataset
+
+### Grades
+
+#### Counting how many restaurants by grade, by type.
+
+```{r}
+rest_inspect %>% 
+  count(boro, grade) %>% 
+  pivot_wider(names_from = grade, values_from = n) %>% 
+  kable() 
+
+rest_inspect %>% 
+  count(boro, cuisine_description) %>% 
+  pivot_wider(names_from = cuisine_description, values_from = n) %>% 
+  kable()
+```
+
+#### Now considering different types of cuisine.
+
+##### Italian/ Pizza Restaurants in NYC
+
+```{r}
+italian = c("Italian", "Italian/Pizza")
+
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, italian)) %>% 
+  count(boro, grade) %>% 
+  pivot_wider(names_from = grade, values_from = n) %>% 
+  kable()
+```
+
+##### French Restaurants in NYC
+
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, "French")) %>% 
+  count(boro, grade) %>% 
+  pivot_wider(names_from = grade, values_from = n) %>% 
+  kable()
+```
+
+##### Mexican Restaurants in NYC
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, "Mexican")) %>% 
+  count(boro, grade) %>% 
+  pivot_wider(names_from = grade, values_from = n) %>% 
+  kable()
+```
+
+##### Pan-Asian Restaurants in NYC
+
+```{r}
+asian = c("Asian", "Japanese", "Korean", "Chinese")
+
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, asian)) %>% 
+  count(boro, grade) %>% 
+  pivot_wider(names_from = grade, values_from = n) %>% 
+  kable()
+```

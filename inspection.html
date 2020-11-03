@@ -11,7 +11,7 @@
 
 
 
-<title>plotly</title>
+<title>NYC Restaurant Inspections</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -360,7 +360,10 @@ div.tocify {
   <a href="inspection.html">Inspection Data</a>
 </li>
 <li>
-  <a href="dashboard_template.html">Dashboard Data</a>
+  <a href="maps.html">Maps</a>
+</li>
+<li>
+  <a href="dashboard_template.html">Dashboard</a>
 </li>
 <li>
   <a href="mailto:&lt;aabramov90@gmail.com&gt;">
@@ -391,33 +394,905 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">plotly</h1>
+<h1 class="title toc-ignore">NYC Restaurant Inspections</h1>
 
 </div>
 
 
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<div id="loading-the-libraries" class="section level2">
-<h2>Loading the libraries</h2>
+<pre class="r"><code>knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path=&#39;Figs/&#39;,
+                      warning=FALSE, message=FALSE)</code></pre>
+<div id="loading-libraries" class="section level2">
+<h2>Loading libraries</h2>
 <pre class="r"><code>library(tidyverse)
-library(httr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;httr&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:plotly&#39;:
-## 
-##     config</code></pre>
-<pre class="r"><code>library(jsonlite)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;jsonlite&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:purrr&#39;:
-## 
-##     flatten</code></pre>
-<pre class="r"><code>library(plotly)
-library(leaflet)</code></pre>
+library(httr)
+library(jsonlite)
+library(plotly)
+library(leaflet)
+library(knitr)</code></pre>
 </div>
-<div id="loading-dataset-from-api" class="section level2">
-<h2>Loading dataset from API</h2>
+<div id="pulling-in-the-dataset" class="section level2">
+<h2>1. Pulling in the dataset</h2>
+<pre class="r"><code>api_url = &quot;https://data.cityofnewyork.us/resource/43nn-pn8j.csv&quot;
+
+rest_inspect = 
+  GET(api_url, query = list(&quot;$limit&quot; = 50000)) %&gt;% 
+  content(&quot;parsed&quot;)</code></pre>
+</div>
+<div id="data-wrangling-cleaning-up-the-dataset." class="section level2">
+<h2>2. Data wrangling, cleaning up the dataset.</h2>
+<pre class="r"><code>rest_inspect = rest_inspect %&gt;% 
+  filter(grade %in% c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;), boro != &quot;0&quot;)</code></pre>
+</div>
+<div id="exploring-dataset" class="section level2">
+<h2>3. Exploring dataset</h2>
+<div id="grades" class="section level3">
+<h3>Grades</h3>
+<div id="counting-how-many-restaurants-by-grade-by-type." class="section level4">
+<h4>Counting how many restaurants by grade, by type.</h4>
+<pre class="r"><code>rest_inspect %&gt;% 
+  count(boro, grade) %&gt;% 
+  pivot_wider(names_from = grade, values_from = n) %&gt;% 
+  kable() </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">1789</td>
+<td align="right">383</td>
+<td align="right">164</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">5007</td>
+<td align="right">849</td>
+<td align="right">278</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">7958</td>
+<td align="right">1186</td>
+<td align="right">506</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">4649</td>
+<td align="right">759</td>
+<td align="right">298</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">723</td>
+<td align="right">112</td>
+<td align="right">33</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>rest_inspect %&gt;% 
+  count(boro, cuisine_description) %&gt;% 
+  pivot_wider(names_from = cuisine_description, values_from = n) %&gt;% 
+  kable()</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="5%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="3%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="2%" />
+<col width="6%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="2%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="2%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="2%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">African</th>
+<th align="right">American</th>
+<th align="right">Armenian</th>
+<th align="right">Asian</th>
+<th align="right">Bagels/Pretzels</th>
+<th align="right">Bakery</th>
+<th align="right">Bangladeshi</th>
+<th align="right">Barbecue</th>
+<th align="right">Bottled beverages, including water, sodas, juices, etc.</th>
+<th align="right">Café/Coffee/Tea</th>
+<th align="right">Caribbean</th>
+<th align="right">Chicken</th>
+<th align="right">Chinese</th>
+<th align="right">Chinese/Cuban</th>
+<th align="right">Czech</th>
+<th align="right">Delicatessen</th>
+<th align="right">Donuts</th>
+<th align="right">Eastern European</th>
+<th align="right">Greek</th>
+<th align="right">Hamburgers</th>
+<th align="right">Hawaiian</th>
+<th align="right">Hotdogs/Pretzels</th>
+<th align="right">Ice Cream, Gelato, Yogurt, Ices</th>
+<th align="right">Indian</th>
+<th align="right">Irish</th>
+<th align="right">Italian</th>
+<th align="right">Japanese</th>
+<th align="right">Jewish/Kosher</th>
+<th align="right">Juice, Smoothies, Fruit Salads</th>
+<th align="right">Latin (Cuban, Dominican, Puerto Rican, South &amp; Central American)</th>
+<th align="right">Mediterranean</th>
+<th align="right">Mexican</th>
+<th align="right">Middle Eastern</th>
+<th align="right">Other</th>
+<th align="right">Pakistani</th>
+<th align="right">Pancakes/Waffles</th>
+<th align="right">Peruvian</th>
+<th align="right">Pizza</th>
+<th align="right">Pizza/Italian</th>
+<th align="right">Russian</th>
+<th align="right">Sandwiches</th>
+<th align="right">Sandwiches/Salads/Mixed Buffet</th>
+<th align="right">Seafood</th>
+<th align="right">Soul Food</th>
+<th align="right">Soups &amp; Sandwiches</th>
+<th align="right">Spanish</th>
+<th align="right">Steak</th>
+<th align="right">Tex-Mex</th>
+<th align="right">Thai</th>
+<th align="right">Vietnamese/Cambodian/Malaysia</th>
+<th align="right">Australian</th>
+<th align="right">Brazilian</th>
+<th align="right">Cajun</th>
+<th align="right">Californian</th>
+<th align="right">Chinese/Japanese</th>
+<th align="right">Continental</th>
+<th align="right">Creole</th>
+<th align="right">Creole/Cajun</th>
+<th align="right">Egyptian</th>
+<th align="right">Ethiopian</th>
+<th align="right">Filipino</th>
+<th align="right">French</th>
+<th align="right">Fruits/Vegetables</th>
+<th align="right">German</th>
+<th align="right">Hotdogs</th>
+<th align="right">Indonesian</th>
+<th align="right">Korean</th>
+<th align="right">Moroccan</th>
+<th align="right">Nuts/Confectionary</th>
+<th align="right">Polish</th>
+<th align="right">Portuguese</th>
+<th align="right">Salads</th>
+<th align="right">Soups</th>
+<th align="right">Tapas</th>
+<th align="right">Turkish</th>
+<th align="right">Vegetarian</th>
+<th align="right">Afghan</th>
+<th align="right">Basque</th>
+<th align="right">English</th>
+<th align="right">Iranian</th>
+<th align="right">Not Listed/Not Applicable</th>
+<th align="right">Scandinavian</th>
+<th align="right">Chilean</th>
+<th align="right">Southwestern</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">30</td>
+<td align="right">393</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td align="right">10</td>
+<td align="right">55</td>
+<td align="right">153</td>
+<td align="right">102</td>
+<td align="right">289</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">18</td>
+<td align="right">71</td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">68</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">16</td>
+<td align="right">11</td>
+<td align="right">11</td>
+<td align="right">58</td>
+<td align="right">20</td>
+<td align="right">9</td>
+<td align="right">32</td>
+<td align="right">212</td>
+<td align="right">4</td>
+<td align="right">135</td>
+<td align="right">7</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">150</td>
+<td align="right">64</td>
+<td align="right">2</td>
+<td align="right">47</td>
+<td align="right">19</td>
+<td align="right">37</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">146</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">22</td>
+<td align="right">1144</td>
+<td align="right">NA</td>
+<td align="right">88</td>
+<td align="right">48</td>
+<td align="right">201</td>
+<td align="right">14</td>
+<td align="right">17</td>
+<td align="right">18</td>
+<td align="right">351</td>
+<td align="right">367</td>
+<td align="right">141</td>
+<td align="right">780</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">65</td>
+<td align="right">113</td>
+<td align="right">36</td>
+<td align="right">25</td>
+<td align="right">62</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="right">72</td>
+<td align="right">73</td>
+<td align="right">15</td>
+<td align="right">160</td>
+<td align="right">192</td>
+<td align="right">176</td>
+<td align="right">78</td>
+<td align="right">164</td>
+<td align="right">61</td>
+<td align="right">272</td>
+<td align="right">76</td>
+<td align="right">19</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td align="right">23</td>
+<td align="right">272</td>
+<td align="right">136</td>
+<td align="right">49</td>
+<td align="right">62</td>
+<td align="right">31</td>
+<td align="right">40</td>
+<td align="right">26</td>
+<td align="right">6</td>
+<td align="right">157</td>
+<td align="right">9</td>
+<td align="right">33</td>
+<td align="right">96</td>
+<td align="right">39</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">19</td>
+<td align="right">11</td>
+<td align="right">23</td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td align="right">45</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">26</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">22</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">29</td>
+<td align="right">45</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">31</td>
+<td align="right">2793</td>
+<td align="right">12</td>
+<td align="right">161</td>
+<td align="right">63</td>
+<td align="right">225</td>
+<td align="right">5</td>
+<td align="right">18</td>
+<td align="right">30</td>
+<td align="right">739</td>
+<td align="right">39</td>
+<td align="right">123</td>
+<td align="right">604</td>
+<td align="right">18</td>
+<td align="right">NA</td>
+<td align="right">145</td>
+<td align="right">106</td>
+<td align="right">27</td>
+<td align="right">46</td>
+<td align="right">85</td>
+<td align="right">32</td>
+<td align="right">14</td>
+<td align="right">89</td>
+<td align="right">178</td>
+<td align="right">143</td>
+<td align="right">556</td>
+<td align="right">478</td>
+<td align="right">66</td>
+<td align="right">142</td>
+<td align="right">221</td>
+<td align="right">127</td>
+<td align="right">307</td>
+<td align="right">42</td>
+<td align="right">41</td>
+<td align="right">5</td>
+<td align="right">NA</td>
+<td align="right">20</td>
+<td align="right">337</td>
+<td align="right">127</td>
+<td align="right">12</td>
+<td align="right">124</td>
+<td align="right">117</td>
+<td align="right">75</td>
+<td align="right">15</td>
+<td align="right">28</td>
+<td align="right">123</td>
+<td align="right">62</td>
+<td align="right">44</td>
+<td align="right">141</td>
+<td align="right">48</td>
+<td align="right">16</td>
+<td align="right">10</td>
+<td align="right">NA</td>
+<td align="right">3</td>
+<td align="right">21</td>
+<td align="right">15</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">4</td>
+<td align="right">8</td>
+<td align="right">4</td>
+<td align="right">227</td>
+<td align="right">3</td>
+<td align="right">12</td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td align="right">101</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">NA</td>
+<td align="right">63</td>
+<td align="right">10</td>
+<td align="right">21</td>
+<td align="right">29</td>
+<td align="right">55</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td align="right">22</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">7</td>
+<td align="right">901</td>
+<td align="right">3</td>
+<td align="right">98</td>
+<td align="right">44</td>
+<td align="right">243</td>
+<td align="right">29</td>
+<td align="right">7</td>
+<td align="right">32</td>
+<td align="right">216</td>
+<td align="right">258</td>
+<td align="right">103</td>
+<td align="right">773</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">94</td>
+<td align="right">112</td>
+<td align="right">13</td>
+<td align="right">74</td>
+<td align="right">92</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">58</td>
+<td align="right">128</td>
+<td align="right">66</td>
+<td align="right">109</td>
+<td align="right">157</td>
+<td align="right">61</td>
+<td align="right">60</td>
+<td align="right">381</td>
+<td align="right">49</td>
+<td align="right">207</td>
+<td align="right">28</td>
+<td align="right">28</td>
+<td align="right">8</td>
+<td align="right">7</td>
+<td align="right">56</td>
+<td align="right">236</td>
+<td align="right">102</td>
+<td align="right">1</td>
+<td align="right">54</td>
+<td align="right">47</td>
+<td align="right">31</td>
+<td align="right">13</td>
+<td align="right">3</td>
+<td align="right">265</td>
+<td align="right">16</td>
+<td align="right">28</td>
+<td align="right">60</td>
+<td align="right">16</td>
+<td align="right">NA</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">7</td>
+<td align="right">17</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">19</td>
+<td align="right">16</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">177</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">6</td>
+<td align="right">11</td>
+<td align="right">10</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">NA</td>
+<td align="right">212</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">7</td>
+<td align="right">31</td>
+<td align="right">NA</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">2</td>
+<td align="right">17</td>
+<td align="right">66</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">8</td>
+<td align="right">32</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">23</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">22</td>
+<td align="right">11</td>
+<td align="right">2</td>
+<td align="right">75</td>
+<td align="right">36</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">8</td>
+<td align="right">6</td>
+<td align="right">57</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5</td>
+<td align="right">55</td>
+<td align="right">62</td>
+<td align="right">5</td>
+<td align="right">22</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="now-considering-different-types-of-cuisine." class="section level4">
+<h4>Now considering different types of cuisine.</h4>
+<div id="italian-pizza-restaurants-in-nyc" class="section level5">
+<h5>Italian/ Pizza Restaurants in NYC</h5>
+<pre class="r"><code>italian = c(&quot;Italian&quot;, &quot;Italian/Pizza&quot;)
+
+rest_inspect %&gt;% 
+  filter(str_detect(cuisine_description, italian)) %&gt;% 
+  count(boro, grade) %&gt;% 
+  pivot_wider(names_from = grade, values_from = n) %&gt;% 
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">52</td>
+<td align="right">8</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">123</td>
+<td align="right">15</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">266</td>
+<td align="right">43</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">98</td>
+<td align="right">11</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">60</td>
+<td align="right">11</td>
+<td align="right">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="french-restaurants-in-nyc" class="section level5">
+<h5>French Restaurants in NYC</h5>
+<pre class="r"><code>rest_inspect %&gt;% 
+  filter(str_detect(cuisine_description, &quot;French&quot;)) %&gt;% 
+  count(boro, grade) %&gt;% 
+  pivot_wider(names_from = grade, values_from = n) %&gt;% 
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Brooklyn</td>
+<td align="right">34</td>
+<td align="right">8</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Manhattan</td>
+<td align="right">204</td>
+<td align="right">17</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Queens</td>
+<td align="right">15</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="mexican-restaurants-in-nyc" class="section level5">
+<h5>Mexican Restaurants in NYC</h5>
+<pre class="r"><code>rest_inspect %&gt;% 
+  filter(str_detect(cuisine_description, &quot;Mexican&quot;)) %&gt;% 
+  count(boro, grade) %&gt;% 
+  pivot_wider(names_from = grade, values_from = n) %&gt;% 
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">98</td>
+<td align="right">23</td>
+<td align="right">14</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">209</td>
+<td align="right">47</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">255</td>
+<td align="right">37</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">165</td>
+<td align="right">28</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">42</td>
+<td align="right">10</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="pan-asian-restaurants-in-nyc" class="section level5">
+<h5>Pan-Asian Restaurants in NYC</h5>
+<pre class="r"><code>asian = c(&quot;Asian&quot;, &quot;Japanese&quot;, &quot;Korean&quot;, &quot;Chinese&quot;)
+
+rest_inspect %&gt;% 
+  filter(str_detect(cuisine_description, asian)) %&gt;% 
+  count(boro, grade) %&gt;% 
+  pivot_wider(names_from = grade, values_from = n) %&gt;% 
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">62</td>
+<td align="right">14</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">231</td>
+<td align="right">58</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">257</td>
+<td align="right">65</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">228</td>
+<td align="right">55</td>
+<td align="right">17</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">30</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 </div>
 
