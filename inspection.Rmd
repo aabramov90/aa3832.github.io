@@ -19,7 +19,7 @@ library(leaflet)
 
 ## Loading dataset from API
 
-```{r Setup API}
+```{r Setup API, eval=FALSE, include=FALSE}
 get_all_inspections = function(url) {
   
   all_inspections = vector("list", length = 0)

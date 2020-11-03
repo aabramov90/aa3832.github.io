@@ -1,5 +1,5 @@
 ---
-title: "Airbnb in NYC Data from 2017"
+title: "NYS DOH Inspections Nov 2020"
 output: 
   flexdashboard::flex_dashboard:
     social: menu
@@ -9,66 +9,7 @@ output:
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(tidyverse)
-library(p8105.datasets)
 library(plotly)
 library(leaflet)
-
-data("nyc_airbnb")
-
-nyc_airbnb_1 = 
-  nyc_airbnb %>% 
-    mutate(
-      rating = review_scores_location / 2) %>% 
-    select(neighbourhood_group, neighbourhood, rating, price, room_type, 
-           lat, long) %>% 
-  filter(neighbourhood_group == "Manhattan",
-         price %in% 100:500,
-         room_type == "Entire home/apt") %>% 
-  drop_na(rating)
-
-nyc_airbnb_2 =
-  nyc_airbnb %>% 
-    mutate(rating = review_scores_location / 2) %>% 
-    select(neighbourhood_group, neighbourhood, rating, price, room_type, lat, long) %>% 
-  filter(price <500,
-         room_type == "Entire home/apt") %>% 
-  drop_na(rating) 
-```
-    
-Column {data-height=600}
--------------------------------------
-
-### Map by Rating
-
-```{r}
-pal = colorNumeric("magma", nyc_airbnb_2 %>% pull(rating))
-
-nyc_airbnb_2 %>% 
-  leaflet() %>% 
-  addProviderTiles(providers$CartoDB.Positron) %>% 
-  addCircleMarkers(~lat, ~long, radius = 0.5, color = ~pal(rating), label = ~rating)
 ```
 
-Column {data-width=400}
--------------------------------------
-   
-### Price of Airbnbs
-
-```{r, warning=FALSE}
-nyc_airbnb_1 %>% 
-  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
-  plot_ly(y = ~price, x = ~neighbourhood, color = ~neighbourhood,
-          type = "box", colors = "viridis")
-```
-
-Column {data-width=400}
--------------------------------------
-### Number of Airbnbs
-
-```{r}
-nyc_airbnb_1 %>% 
-  count(neighbourhood) %>% 
-  mutate(
-    neighbourhood = fct_reorder(neighbourhood, n)) %>% 
-  plot_ly(x = ~neighbourhood, y = ~n, color = ~neighbourhood, type = "bar", colors = "viridis")
-```
