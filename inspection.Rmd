@@ -53,7 +53,6 @@ rest_inspect %>%
 
 rest_inspect %>% 
   count(boro, cuisine_description) %>% 
-  pivot_wider(names_from = cuisine_description, values_from = n) %>% 
   kable()
 ```
 

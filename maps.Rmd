@@ -8,10 +8,13 @@ output:
 
 # Setup
 
-```{r Setup}
+```{r}
 knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
                       warning=FALSE, message=FALSE)
+```
 
+
+```{r Setup}
 library(tidyverse)
 library(httr)
 library(jsonlite)
