@@ -1,6 +1,8 @@
 ---
 title: "NYC DOH Restaurant Inspections"
-output: flexdashboard::flex_dashboard
+output:   
+    flexdashboard::flex_dashboard:
+      vertical_layout: scroll
 ---
 
 ```{r}
@@ -43,9 +45,8 @@ asian = c("Asian", "Japanese", "Korean", "Chinese")
 Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWFicmFtb3Y5MCIsImEiOiJja2gyZm5obzQwNWIxMnFxc3phcWh1MWtwIn0.amAvJHtFkTl9XWJ68fh96Q')
 ```
 
-New Restaurants
 -------------------------------------
-    
+
 ### New Restaurants in New York by Borough
     
 ```{r}
@@ -59,24 +60,8 @@ rest_inspect %>%
          yaxis = list(title = "Restaurants (n)", zeroline = TRUE))
 ```
    
-Maps {.tabset}
 -------------------------------------
-   
-### French Restaurants
 
-```{r}
-rest_inspect %>% 
-  filter(str_detect(cuisine_description, "French")) %>% 
-  filter(latitude > 0) %>% 
-  mutate(
-    text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
-  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
-  layout(
-    mapbox = list(
-      zoom = 10,
-      center = list(lat = 40.67, lon = -73.97)))
-```   
- 
 ### Asian Restaurants
     
 ```{r}
@@ -94,6 +79,7 @@ rest_inspect %>%
 ```
 
 ### Italian and Pizza Restaurants
+
 ```{r}
 rest_inspect %>% 
   filter(str_detect(cuisine_description, italian)) %>% 
@@ -108,6 +94,7 @@ rest_inspect %>%
 ```
 
 ### Mexican
+
 ```{r}
 rest_inspect %>% 
   filter(str_detect(cuisine_description, "Mexican")) %>% 
@@ -121,11 +108,10 @@ rest_inspect %>%
       center = list(lat = 40.67, lon = -73.97)))
 ```
 
-
-Scores
 -------------------------------------
    
-### Boxplot of Scores
+### Boxplot of Restaurant Inspection Scores
+
 ```{r}
 rest_inspect %>% 
   group_by(boro) %>% 
