@@ -21,6 +21,18 @@ library(jsonlite)
 library(plotly)
 library(leaflet)
 library(knitr)
+
+theme_set(
+  ggthemes::theme_fivethirtyeight() + theme(legend.position = "bottom")
+  )
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.colour = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
 
 
@@ -50,10 +62,6 @@ rest_inspect %>%
   count(boro, grade) %>% 
   pivot_wider(names_from = grade, values_from = n) %>% 
   kable() 
-
-rest_inspect %>% 
-  count(boro, cuisine_description) %>% 
-  kable()
 ```
 
 #### Now considering different types of cuisine.
@@ -94,9 +102,51 @@ rest_inspect %>%
 ```{r}
 asian = c("Asian", "Japanese", "Korean", "Chinese")
 
-rest_inspect %>% 
+rest_grade =
+  rest_inspect %>% 
   filter(str_detect(cuisine_description, asian)) %>% 
   count(boro, grade) %>% 
   pivot_wider(names_from = grade, values_from = n) %>% 
   kable()
 ```
+
+### Critical flags
+
+```{r}
+rest_crit = 
+  rest_inspect %>%
+  count(boro, critical_flag) %>%   
+  drop_na(critical_flag) %>% 
+  pivot_wider(names_from = critical_flag, values_from = n) %>% 
+  mutate(rest_ratio = N / (N+Y)) %>% 
+  kable()
+```
+
+### Concerning findings
+
+```{r}
+concern = c("mice", "vermin", "roaches")
+  
+rest_concern = 
+  rest_inspect %>%
+  filter(boro == "Bronx") %>% 
+  filter(str_detect(violation_code, "04"))
+```
+
+Year to Year Trends in New Restaurants
+```{r}
+rest_year_plot = 
+  rest_inspect %>% 
+  filter(str_detect(inspection_type, "Initial")) %>% 
+  separate(grade_date, sep="-", into = c("grade_year", "grade_month", "grade_day")) %>%
+  count(boro, grade_year) %>% 
+  ggplot(aes(x = grade_year, y = n, color = boro)) + 
+  geom_col((aes(fill = boro))) +
+  labs(
+    title = "New Restaurants in New York City",
+    x = "Year",
+    y = "Number of Restaurants")
+rest_year_plot
+```
+
+

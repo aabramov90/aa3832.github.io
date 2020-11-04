@@ -1,15 +1,111 @@
 ---
-title: "NYS DOH Inspections Nov 2020"
-output: 
-  flexdashboard::flex_dashboard:
-    social: menu
-    source: embed
+title: "NYC DOH Restaurant Inspections"
+output: flexdashboard::flex_dashboard
 ---
+```{r}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      warning=FALSE, message=FALSE)
+```
 
-```{r setup, include=FALSE}
-library(flexdashboard)
+```{r}
 library(tidyverse)
+library(httr)
+library(jsonlite)
 library(plotly)
 library(leaflet)
+library(knitr)
+
+theme_set(
+  ggthemes::theme_fivethirtyeight() + theme(legend.position = "bottom")
+  )
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.colour = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+api_url = "https://data.cityofnewyork.us/resource/43nn-pn8j.csv"
+
+rest_inspect = 
+  GET(api_url, query = list("$limit" = 50000)) %>% 
+  content("parsed")
+
+rest_inspect = rest_inspect %>% 
+  filter(grade %in% c("A", "B", "C"), boro != "0")
+
+italian = c("Italian", "Italian/Pizza")
+asian = c("Asian", "Japanese", "Korean", "Chinese")
+
+Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWFicmFtb3Y5MCIsImEiOiJja2gyZm5obzQwNWIxMnFxc3phcWh1MWtwIn0.amAvJHtFkTl9XWJ68fh96Q')
+```
+
+Column 
+-------------------------------------
+    
+### Number of New Restaurants in New York
+    
+```{r}
+rest_year_plot = 
+  rest_inspect %>% 
+  filter(str_detect(inspection_type, "Initial")) %>% 
+  separate(grade_date, sep="-", into = c("grade_year", "grade_month", "grade_day")) %>%
+  count(boro, grade_year) %>% 
+  ggplot(aes(x = grade_year, y = n, color = boro)) + 
+  geom_col((aes(fill = boro))) +
+  labs(
+    title = "New Restaurants in New York City",
+    x = "Year",
+    y = "Number of Restaurants")
+rest_year_plot
+```
+   
+Maps {.tabset}
+-------------------------------------
+   
+### French Restaurants
+
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, "French")) %>% 
+  filter(latitude > 0) %>% 
+  mutate(
+    text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
+  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
+  layout(
+    mapbox = list(
+      zoom = 9,
+      center = list(lat = 40.67, lon = -73.97)))
+```   
+ 
+### Asian Restaurants
+    
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, asian)) %>% 
+  filter(latitude > 0) %>% 
+  mutate(
+    text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
+  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
+  layout(
+    mapbox = list(
+      zoom = 9,
+      center = list(lat = 40.67, lon = -73.97)))
+```
+
+### Italian/Pizza Restaurants
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, italian)) %>% 
+  filter(latitude > 0) %>% 
+  mutate(
+    text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
+  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
+  layout(
+    mapbox = list(
+      zoom = 9,
+      center = list(lat = 40.67, lon = -73.97)))
 ```
 
