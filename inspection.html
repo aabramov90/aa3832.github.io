@@ -11,7 +11,7 @@
 
 
 
-<title>NYC Restaurant Inspection: Exploring the Data</title>
+<title>NYC Restaurant Inspection Data</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -394,7 +394,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">NYC Restaurant Inspection: Exploring the Data</h1>
+<h1 class="title toc-ignore">NYC Restaurant Inspection Data</h1>
 
 </div>
 
@@ -441,8 +441,8 @@ rest_inspect =
 <h2>3. Exploring dataset</h2>
 <div id="grades" class="section level3">
 <h3>Grades</h3>
-<div id="counting-how-many-restaurants-by-grade-by-type." class="section level4">
-<h4>Counting how many restaurants by grade, by type.</h4>
+<div id="counting-the-number-of-restaurants-by-borough-and-by-grade." class="section level4">
+<h4>Counting the number of restaurants by borough and by grade.</h4>
 <pre class="r"><code>rest_inspect %&gt;% 
   count(boro, grade) %&gt;% 
   pivot_wider(names_from = grade, values_from = n) %&gt;% 
@@ -490,12 +490,11 @@ rest_inspect =
 </tbody>
 </table>
 </div>
-<div id="now-considering-different-types-of-cuisine." class="section level4">
-<h4>Now considering different types of cuisine.</h4>
+<div id="filtering-based-on-cuisine" class="section level4">
+<h4>Filtering based on Cuisine</h4>
 <div id="italian-pizza-restaurants-in-nyc" class="section level5">
 <h5>Italian/ Pizza Restaurants in NYC</h5>
 <pre class="r"><code>italian = c(&quot;Italian&quot;, &quot;Italian/Pizza&quot;)
-
 rest_inspect %&gt;% 
   filter(str_detect(cuisine_description, italian)) %&gt;% 
   count(boro, grade) %&gt;% 
@@ -645,16 +644,59 @@ rest_grade =
 </div>
 </div>
 </div>
-<div id="critical-flags" class="section level3">
-<h3>Critical flags</h3>
-<pre class="r"><code>rest_crit = 
-  rest_inspect %&gt;%
+<div id="critical-flags-identified-at-inspection" class="section level3">
+<h3>Critical flags identified at inspection</h3>
+<pre class="r"><code>rest_inspect %&gt;%
   count(boro, critical_flag) %&gt;%   
   drop_na(critical_flag) %&gt;% 
   pivot_wider(names_from = critical_flag, values_from = n) %&gt;% 
   mutate(rest_ratio = N / (N+Y)) %&gt;% 
   kable()</code></pre>
-<p>Year to Year Trends in New Restaurants</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">boro</th>
+<th align="right">N</th>
+<th align="right">Y</th>
+<th align="right">rest_ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bronx</td>
+<td align="right">1120</td>
+<td align="right">1200</td>
+<td align="right">0.4827586</td>
+</tr>
+<tr class="even">
+<td align="left">Brooklyn</td>
+<td align="right">3011</td>
+<td align="right">3062</td>
+<td align="right">0.4958011</td>
+</tr>
+<tr class="odd">
+<td align="left">Manhattan</td>
+<td align="right">4636</td>
+<td align="right">4945</td>
+<td align="right">0.4838743</td>
+</tr>
+<tr class="even">
+<td align="left">Queens</td>
+<td align="right">2815</td>
+<td align="right">2844</td>
+<td align="right">0.4974377</td>
+</tr>
+<tr class="odd">
+<td align="left">Staten Island</td>
+<td align="right">422</td>
+<td align="right">439</td>
+<td align="right">0.4901278</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="year-to-year-trends-in-new-restaurants" class="section level3">
+<h3>Year to Year Trends in New Restaurants</h3>
 <pre class="r"><code>rest_year_plot = 
   rest_inspect %&gt;% 
   filter(str_detect(inspection_type, &quot;Initial&quot;)) %&gt;% 
@@ -671,11 +713,11 @@ rest_year_plot</code></pre>
 </div>
 <div id="restaurant-scores" class="section level3">
 <h3>Restaurant Scores</h3>
-<div id="boxplot-of-scores-by-boro" class="section level4">
-<h4>Boxplot of Scores by Boro</h4>
+<div id="boxplot-of-scores-by-borough" class="section level4">
+<h4>Boxplot of Scores by Borough</h4>
 <pre class="r"><code>rest_inspect %&gt;% 
   group_by(boro) %&gt;% 
-  filter(score %in% 1:30) %&gt;% 
+  filter(score %in% 1:30)  %&gt;% 
   ggplot(aes(x = boro, y = score, color = boro)) +
   geom_boxplot() +
   labs(

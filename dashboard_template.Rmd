@@ -48,18 +48,14 @@ New Restaurants
 ### New Restaurants in New York by Borough
     
 ```{r}
-rest_year_plot = 
-  rest_inspect %>% 
+rest_inspect %>% 
   filter(str_detect(inspection_type, "Initial")) %>% 
   separate(grade_date, sep="-", into = c("grade_year", "grade_month", "grade_day")) %>%
   count(boro, grade_year) %>% 
-  ggplot(aes(x = grade_year, y = n, color = boro)) + 
-  geom_col((aes(fill = boro))) +
-  labs(
-    title = "New Restaurants in New York City",
-    x = "Year",
-    y = "Number of Restaurants")
-rest_year_plot
+  plot_ly(x = ~grade_year, y = ~n, color = ~boro, type = "bar", colors = "viridis") %>%
+    layout(title = "New Restaurants in NYC",
+         xaxis = list(title = "Year", zeroline = TRUE),
+         yaxis = list(title = "Restaurants (n)", zeroline = TRUE))
 ```
    
 Maps {.tabset}
@@ -76,7 +72,7 @@ rest_inspect %>%
   plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
   layout(
     mapbox = list(
-      zoom = 9,
+      zoom = 10,
       center = list(lat = 40.67, lon = -73.97)))
 ```   
  
@@ -88,14 +84,15 @@ rest_inspect %>%
   filter(latitude > 0) %>% 
   mutate(
     text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
-  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
+  plot_mapbox(
+    x = ~longitude, y = ~latitude, type = "scattermapbox", color =~grade, text =~text_label) %>% 
   layout(
     mapbox = list(
-      zoom = 9,
+      zoom = 10,
       center = list(lat = 40.67, lon = -73.97)))
 ```
 
-### Italian/Pizza Restaurants
+### Italian and Pizza Restaurants
 ```{r}
 rest_inspect %>% 
   filter(str_detect(cuisine_description, italian)) %>% 
@@ -105,9 +102,24 @@ rest_inspect %>%
   plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
   layout(
     mapbox = list(
-      zoom = 9,
+      zoom = 10,
       center = list(lat = 40.67, lon = -73.97)))
 ```
+
+### Mexican
+```{r}
+rest_inspect %>% 
+  filter(str_detect(cuisine_description, "Mexican")) %>% 
+  filter(latitude > 0) %>% 
+  mutate(
+    text_label = str_c("Name: ", dba, "\nGrade: ", grade)) %>% 
+  plot_mapbox(x = ~longitude, y = ~latitude, color =~grade, text =~text_label) %>% 
+  layout(
+    mapbox = list(
+      zoom = 10,
+      center = list(lat = 40.67, lon = -73.97)))
+```
+
 
 Scores
 -------------------------------------
@@ -116,12 +128,12 @@ Scores
 ```{r}
 rest_inspect %>% 
   group_by(boro) %>% 
-  filter(score %in% 1:30) %>% 
-  ggplot(aes(x = boro, y = score, color = boro)) +
-  geom_boxplot() +
-  labs(
-    title = "Distribution of Scores",
-    x = "Boro",
-    y = "Score")
+  filter(score %in% 1:30)  %>% 
+  plot_ly(
+    y = ~score, x = ~boro, color = ~boro,
+    type = "box", colors = "viridis") %>% 
+  layout(title = "Distribution of Scores",
+         xaxis = list(title = "Borough", zeroline = TRUE),
+         yaxis = list(title = "Score", zeroline = TRUE))
 ```
 

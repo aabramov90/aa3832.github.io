@@ -1,5 +1,5 @@
 ---
-title: "NYC Restaurant Inspection: Exploring the Data"
+title: "NYC Restaurant Inspection Data"
 output: 
   html_document:
     toc: true
@@ -55,7 +55,7 @@ rest_inspect = rest_inspect %>%
 
 ### Grades
 
-#### Counting how many restaurants by grade, by type.
+#### Counting the number of restaurants by borough and by grade.  
 
 ```{r}
 rest_inspect %>% 
@@ -64,13 +64,12 @@ rest_inspect %>%
   kable() 
 ```
 
-#### Now considering different types of cuisine.
+#### Filtering based on Cuisine
 
 ##### Italian/ Pizza Restaurants in NYC
 
 ```{r}
 italian = c("Italian", "Italian/Pizza")
-
 rest_inspect %>% 
   filter(str_detect(cuisine_description, italian)) %>% 
   count(boro, grade) %>% 
@@ -89,6 +88,7 @@ rest_inspect %>%
 ```
 
 ##### Mexican Restaurants in NYC
+
 ```{r}
 rest_inspect %>% 
   filter(str_detect(cuisine_description, "Mexican")) %>% 
@@ -110,11 +110,10 @@ rest_grade =
   kable()
 ```
 
-### Critical flags
+### Critical flags identified at inspection
 
 ```{r}
-rest_crit = 
-  rest_inspect %>%
+rest_inspect %>%
   count(boro, critical_flag) %>%   
   drop_na(critical_flag) %>% 
   pivot_wider(names_from = critical_flag, values_from = n) %>% 
@@ -122,7 +121,8 @@ rest_crit =
   kable()
 ```
 
-Year to Year Trends in New Restaurants
+### Year to Year Trends in New Restaurants
+
 ```{r}
 rest_year_plot = 
   rest_inspect %>% 
@@ -140,12 +140,12 @@ rest_year_plot
 
 ### Restaurant Scores
 
-#### Boxplot of Scores by Boro
+#### Boxplot of Scores by Borough
 
 ```{r}
 rest_inspect %>% 
   group_by(boro) %>% 
-  filter(score %in% 1:30) %>% 
+  filter(score %in% 1:30)  %>% 
   ggplot(aes(x = boro, y = score, color = boro)) +
   geom_boxplot() +
   labs(
