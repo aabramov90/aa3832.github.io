@@ -644,57 +644,6 @@ rest_grade =
 </div>
 </div>
 </div>
-<div id="critical-flags-identified-at-inspection" class="section level3">
-<h3>Critical flags identified at inspection</h3>
-<pre class="r"><code>rest_inspect %&gt;%
-  count(boro, critical_flag) %&gt;%   
-  drop_na(critical_flag) %&gt;% 
-  pivot_wider(names_from = critical_flag, values_from = n) %&gt;% 
-  mutate(rest_ratio = N / (N+Y)) %&gt;% 
-  kable()</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">boro</th>
-<th align="right">N</th>
-<th align="right">Y</th>
-<th align="right">rest_ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Bronx</td>
-<td align="right">1120</td>
-<td align="right">1200</td>
-<td align="right">0.4827586</td>
-</tr>
-<tr class="even">
-<td align="left">Brooklyn</td>
-<td align="right">3011</td>
-<td align="right">3062</td>
-<td align="right">0.4958011</td>
-</tr>
-<tr class="odd">
-<td align="left">Manhattan</td>
-<td align="right">4636</td>
-<td align="right">4945</td>
-<td align="right">0.4838743</td>
-</tr>
-<tr class="even">
-<td align="left">Queens</td>
-<td align="right">2815</td>
-<td align="right">2844</td>
-<td align="right">0.4974377</td>
-</tr>
-<tr class="odd">
-<td align="left">Staten Island</td>
-<td align="right">422</td>
-<td align="right">439</td>
-<td align="right">0.4901278</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div id="year-to-year-trends-in-new-restaurants" class="section level3">
 <h3>Year to Year Trends in New Restaurants</h3>
 <pre class="r"><code>rest_year_plot = 
@@ -709,7 +658,7 @@ rest_grade =
     x = &quot;Year&quot;,
     y = &quot;Number of Restaurants&quot;)
 rest_year_plot</code></pre>
-<p><img src="Figs/unnamed-chunk-10-1.png" width="1152" /></p>
+<p><img src="Figs/unnamed-chunk-9-1.png" width="1152" /></p>
 </div>
 <div id="restaurant-scores" class="section level3">
 <h3>Restaurant Scores</h3>
@@ -724,7 +673,7 @@ rest_year_plot</code></pre>
     title = &quot;Distribution of Scores&quot;,
     x = &quot;Boro&quot;,
     y = &quot;Score&quot;)</code></pre>
-<p><img src="Figs/unnamed-chunk-11-1.png" width="1152" /></p>
+<p><img src="Figs/unnamed-chunk-10-1.png" width="1152" /></p>
 </div>
 </div>
 </div>

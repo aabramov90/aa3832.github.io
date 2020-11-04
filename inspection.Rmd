@@ -110,17 +110,6 @@ rest_grade =
   kable()
 ```
 
-### Critical flags identified at inspection
-
-```{r}
-rest_inspect %>%
-  count(boro, critical_flag) %>%   
-  drop_na(critical_flag) %>% 
-  pivot_wider(names_from = critical_flag, values_from = n) %>% 
-  mutate(rest_ratio = N / (N+Y)) %>% 
-  kable()
-```
-
 ### Year to Year Trends in New Restaurants
 
 ```{r}
