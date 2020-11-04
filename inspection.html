@@ -439,6 +439,22 @@ rest_inspect =
 </div>
 <div id="exploring-dataset" class="section level2">
 <h2>3. Exploring dataset</h2>
+<div id="year-to-year-trends-in-new-restaurants" class="section level3">
+<h3>Year to Year Trends in New Restaurants</h3>
+<pre class="r"><code>rest_year_plot = 
+  rest_inspect %&gt;% 
+  filter(str_detect(inspection_type, &quot;Initial&quot;)) %&gt;% 
+  separate(grade_date, sep=&quot;-&quot;, into = c(&quot;grade_year&quot;, &quot;grade_month&quot;, &quot;grade_day&quot;)) %&gt;%
+  count(boro, grade_year) %&gt;% 
+  ggplot(aes(x = grade_year, y = n, color = boro)) + 
+  geom_col((aes(fill = boro))) +
+  labs(
+    title = &quot;New Restaurants in New York City&quot;,
+    x = &quot;Year&quot;,
+    y = &quot;Number of Restaurants&quot;)
+rest_year_plot</code></pre>
+<p><img src="Figs/unnamed-chunk-4-1.png" width="1152" /></p>
+</div>
 <div id="grades" class="section level3">
 <h3>Grades</h3>
 <div id="counting-the-number-of-restaurants-by-borough-and-by-grade." class="section level4">
@@ -643,22 +659,6 @@ rest_grade =
   kable()</code></pre>
 </div>
 </div>
-</div>
-<div id="year-to-year-trends-in-new-restaurants" class="section level3">
-<h3>Year to Year Trends in New Restaurants</h3>
-<pre class="r"><code>rest_year_plot = 
-  rest_inspect %&gt;% 
-  filter(str_detect(inspection_type, &quot;Initial&quot;)) %&gt;% 
-  separate(grade_date, sep=&quot;-&quot;, into = c(&quot;grade_year&quot;, &quot;grade_month&quot;, &quot;grade_day&quot;)) %&gt;%
-  count(boro, grade_year) %&gt;% 
-  ggplot(aes(x = grade_year, y = n, color = boro)) + 
-  geom_col((aes(fill = boro))) +
-  labs(
-    title = &quot;New Restaurants in New York City&quot;,
-    x = &quot;Year&quot;,
-    y = &quot;Number of Restaurants&quot;)
-rest_year_plot</code></pre>
-<p><img src="Figs/unnamed-chunk-9-1.png" width="1152" /></p>
 </div>
 <div id="restaurant-scores" class="section level3">
 <h3>Restaurant Scores</h3>

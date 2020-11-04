@@ -53,6 +53,23 @@ rest_inspect = rest_inspect %>%
 
 ## 3.  Exploring dataset
 
+### Year to Year Trends in New Restaurants
+
+```{r}
+rest_year_plot = 
+  rest_inspect %>% 
+  filter(str_detect(inspection_type, "Initial")) %>% 
+  separate(grade_date, sep="-", into = c("grade_year", "grade_month", "grade_day")) %>%
+  count(boro, grade_year) %>% 
+  ggplot(aes(x = grade_year, y = n, color = boro)) + 
+  geom_col((aes(fill = boro))) +
+  labs(
+    title = "New Restaurants in New York City",
+    x = "Year",
+    y = "Number of Restaurants")
+rest_year_plot
+```
+
 ### Grades
 
 #### Counting the number of restaurants by borough and by grade.  
@@ -108,23 +125,6 @@ rest_grade =
   count(boro, grade) %>% 
   pivot_wider(names_from = grade, values_from = n) %>% 
   kable()
-```
-
-### Year to Year Trends in New Restaurants
-
-```{r}
-rest_year_plot = 
-  rest_inspect %>% 
-  filter(str_detect(inspection_type, "Initial")) %>% 
-  separate(grade_date, sep="-", into = c("grade_year", "grade_month", "grade_day")) %>%
-  count(boro, grade_year) %>% 
-  ggplot(aes(x = grade_year, y = n, color = boro)) + 
-  geom_col((aes(fill = boro))) +
-  labs(
-    title = "New Restaurants in New York City",
-    x = "Year",
-    y = "Number of Restaurants")
-rest_year_plot
 ```
 
 ### Restaurant Scores
