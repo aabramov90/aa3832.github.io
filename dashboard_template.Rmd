@@ -2,6 +2,7 @@
 title: "NYC DOH Restaurant Inspections"
 output: flexdashboard::flex_dashboard
 ---
+
 ```{r}
 knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
                       warning=FALSE, message=FALSE)
