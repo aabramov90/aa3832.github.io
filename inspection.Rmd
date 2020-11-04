@@ -122,17 +122,6 @@ rest_crit =
   kable()
 ```
 
-### Concerning findings
-
-```{r}
-concern = c("mice", "vermin", "roaches")
-  
-rest_concern = 
-  rest_inspect %>%
-  filter(boro == "Bronx") %>% 
-  filter(str_detect(violation_code, "04"))
-```
-
 Year to Year Trends in New Restaurants
 ```{r}
 rest_year_plot = 
@@ -148,5 +137,22 @@ rest_year_plot =
     y = "Number of Restaurants")
 rest_year_plot
 ```
+
+### Restaurant Scores
+
+#### Boxplot of Scores by Boro
+
+```{r}
+rest_inspect %>% 
+  group_by(boro) %>% 
+  filter(score %in% 1:30) %>% 
+  ggplot(aes(x = boro, y = score, color = boro)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Scores",
+    x = "Boro",
+    y = "Score")
+```
+
 
 

@@ -42,10 +42,10 @@ asian = c("Asian", "Japanese", "Korean", "Chinese")
 Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWFicmFtb3Y5MCIsImEiOiJja2gyZm5obzQwNWIxMnFxc3phcWh1MWtwIn0.amAvJHtFkTl9XWJ68fh96Q')
 ```
 
-Column 
+New Restaurants
 -------------------------------------
     
-### Number of New Restaurants in New York
+### New Restaurants in New York by Borough
     
 ```{r}
 rest_year_plot = 
@@ -107,5 +107,21 @@ rest_inspect %>%
     mapbox = list(
       zoom = 9,
       center = list(lat = 40.67, lon = -73.97)))
+```
+
+Scores
+-------------------------------------
+   
+### Boxplot of Scores
+```{r}
+rest_inspect %>% 
+  group_by(boro) %>% 
+  filter(score %in% 1:30) %>% 
+  ggplot(aes(x = boro, y = score, color = boro)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Scores",
+    x = "Boro",
+    y = "Score")
 ```
 

@@ -654,15 +654,6 @@ rest_grade =
   pivot_wider(names_from = critical_flag, values_from = n) %&gt;% 
   mutate(rest_ratio = N / (N+Y)) %&gt;% 
   kable()</code></pre>
-</div>
-<div id="concerning-findings" class="section level3">
-<h3>Concerning findings</h3>
-<pre class="r"><code>concern = c(&quot;mice&quot;, &quot;vermin&quot;, &quot;roaches&quot;)
-  
-rest_concern = 
-  rest_inspect %&gt;%
-  filter(boro == &quot;Bronx&quot;) %&gt;% 
-  filter(str_detect(violation_code, &quot;04&quot;))</code></pre>
 <p>Year to Year Trends in New Restaurants</p>
 <pre class="r"><code>rest_year_plot = 
   rest_inspect %&gt;% 
@@ -676,7 +667,23 @@ rest_concern =
     x = &quot;Year&quot;,
     y = &quot;Number of Restaurants&quot;)
 rest_year_plot</code></pre>
+<p><img src="Figs/unnamed-chunk-10-1.png" width="1152" /></p>
+</div>
+<div id="restaurant-scores" class="section level3">
+<h3>Restaurant Scores</h3>
+<div id="boxplot-of-scores-by-boro" class="section level4">
+<h4>Boxplot of Scores by Boro</h4>
+<pre class="r"><code>rest_inspect %&gt;% 
+  group_by(boro) %&gt;% 
+  filter(score %in% 1:30) %&gt;% 
+  ggplot(aes(x = boro, y = score, color = boro)) +
+  geom_boxplot() +
+  labs(
+    title = &quot;Distribution of Scores&quot;,
+    x = &quot;Boro&quot;,
+    y = &quot;Score&quot;)</code></pre>
 <p><img src="Figs/unnamed-chunk-11-1.png" width="1152" /></p>
+</div>
 </div>
 </div>
 </div>
